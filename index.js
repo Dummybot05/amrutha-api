@@ -56,25 +56,11 @@ app.get('/all', async (req, res) => {
 })
 
 app.get('/home', async (req, res) => {
-  var balance = Math.floor(Math.random() * 300).toFixed(2);
   if (req.session.user) {
-    console.log(req.session.user)
-    let qr = await generateQR(req.session.user.uuid); // data:image/png;base64,
-    try {
-      const [{ result }] = await sql`
-          INSERT INTO users (uuid, balance, qrcode) VALUES (${req.session.user.uuid}, ${balance}, ${qr})
-          RETURNING TRUE AS result
-      `;
-      if (result) {
-        res.status(200).send({ message: 'Welcome to Home!', user: req.session.user });
-        return;
-      }
-    } catch (e) {
-      res.status(500).send({ error: e.message });
-      return;
-    }
+    res.status(200).send({ status: "success", message: req.session.user });
+    return
   }
-  res.status(401).send({ error: 'Not authenticated' });
+  res.status(401).send({ status: "failed", message: 'Not authenticated' });
 });
 
 app.listen(port, () => {
